@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block tittle %}Detail{% endblock %}
+{% block content %}
+
+    {% if user.is_authenticated %}
+    <h1 class="my-4">Detail -
+        <small>{{ object.hawker }}</small>
+    </h1>
+    <div class="row">
+        <div class="col-12">
+            <ul class="list-group">
+              <li class="list-group-item"><strong>Name:</strong> {{ object.hawker }}</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="row top-buffer">
+        <div class="col-12">
+                <a href="{% url 'bon_edit' object.id %}"><button type="button" class="btn btn-success">Edit</button></a>
+                <a href="{% url 'bon_list' %}"><button type="button" class="btn btn-secondary">Back</button></a>
+        </div>
+    </div>
+    {% else %}
+    You're not allowed!<br/><br/>
+    Click <a href="{% url 'register' %}">Here</a> To Register.
+    {% endif %}
+{% endblock %}

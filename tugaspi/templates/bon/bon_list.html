@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block content %}
+
+{% if user.is_authenticated %}
+
+    <h1 class="my-4">
+        <small>Bon</small> 
+    </h1>
+    <div class="row">
+        <div class="col-12" style="overflow-x: scroll">
+            <table class="table">
+              <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Product</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Stock</th>
+                    <th scope="col">---</th>
+                    <th scope="col">Hawker Stock</th>
+                    <th scope="col">Sold Product</th>
+                    <th scope="col">Price per Item</th>
+                    <th scope="col">View</th>
+                    <th scope="col">Delete</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in Product %}
+                
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>Rp.{{ item.price }}</td>
+                    <td>{{ item.stock }}</td>
+                    <td>---</td>
+                    <td>---</td>
+                    <td>---</td>
+                    <td>Rp.</td>
+                    <td><a href="{% url 'bon_view' bon.id %}"><button type="button" class="btn btn-outline-primary btn-sm">View</button></a></td>
+                    <td><a href="{% url 'bon_delete' bon.id %}"><button type="button" class="btn btn-outline-danger btn-sm">Delete</button></a></td>
+                </tr>
+                
+                {% endfor %}
+              </tbody>
+            </table>
+        </div>
+    </div>
+{% else %}
+    You're not allowed!<br/><br/>
+    Click <a href="{% url 'register' %}">Here</a> To Register.
+{% endif %}
+{% endblock %}

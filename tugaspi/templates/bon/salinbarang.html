@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    {% if user.is_authenticated %}
+
+    <h1 class="my-4">
+        {% if request.path == '/salinbarang/' %} New Bon {% else %} Edit Bon {% endif %}
+    </h1>
+    <div class="row">
+        <div  class="table-responsive" style="overflow-x: scroll">
+            <form method="post">
+                {% csrf_token %}
+                <div class="container">
+                    <div class="row">
+                        <div class="col">
+                            <select name="hawker_id" class="custom-select mr-sm-2" id="inlineFormCustomSelect">
+                                <option selected>Choose Hawker...</option>
+                                {% for hawker in hawkers %}
+                                    <option value={{hawker.id}}>{{hawker.name}}</option>
+                                {% endfor %}
+                            </select>    
+                        </div>
+                        <div class="col">
+                            <input type="date"  class="custom-select mr-sm-2" name="date">
+                        </div>
+                    </div>
+                </div>
+                <br/><br/>
+                <table class="table table-sm">
+                    <thead class="thead-dark">
+                      <tr>
+                        <th scope="col">Product</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">---</th>
+                        <th scope="col">Stock</th>
+                        <th scope="col">Hawker Stock Increment</th>
+                        <th scope="col">Hawker Stock</th>
+                        {% if request.path != '/salinbarang/' %}
+                        <th scope="col">Sold Product</th>
+                        {% endif %}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for product in products %}
+                      
+                      <tr>
+                        <td>{{product.name}}</td>
+                        <td>Rp.{{product.price}}</td>
+                        {% if request.path != '/salinbarang/' %}
+                        <td>{{product.stock}}</td>
+                        {% endif %}
+                        <td>---</td>
+                        <td><input type="number" name="stock_increment" placeholder="Input number"></input></td>
+                        <td></td>
+                        <td><input type="number" name="sold_product" placeholder="Input number"></td>
+                       
+                      </tr>
+                      
+                      {% endfor %}
+                    </tbody>
+                  </table>
+
+                <br/>
+                <div class="col-6">
+                    <input type="submit" value='salin bon hari ini' class="btn btn-success"/>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% else %}
+        You're not allowed!<br/><br/>
+        Click <a href="{% url 'register' %}">Here</a> To Register.
+    {% endif %}
+{% endblock %}

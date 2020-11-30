@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block tittle %}Delete{% endblock %}
+{% block content %}
+
+    {% if user.is_authenticated %}
+    <h1 class="my-4">Delete -
+        <small>{{ object }}</small>
+    </h1>
+    <div class="row">
+        <div class="col-12">
+            <form method="post">
+                {% csrf_token %}
+                <div class="alert alert-warning" role="alert">
+                  Are you sure to delete {{ object }} ?
+                </div>
+                <input type="submit" class="btn btn-danger" value="Yes, delete it" />
+                <a class="btn btn-success" href="{% url 'product_list' %}">No, just I've tried the delete button hehe</a>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    You're not allowed!<br/><br/>
+    <a href="{% url 'product_list' %}"><button type="button" class="btn btn-primary">Back</button></a>
+    {% endif %}
+{% endblock %}
