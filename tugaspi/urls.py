@@ -16,5 +16,7 @@ urlpatterns = [
     path('edit-bon/<int:pk>', BonUpdate.as_view(), name='bon_edit'),
     path('delete-bon/<int:pk>', BonDelete.as_view(), name='bon_delete'),
 
-    path('salinbarang/', SalinBarang, name='salin_barang')
+    path('salinbarang/', SalinBarang, name='salin_barang'),
+
+    path('today-transaction/', TodayTransaction, name='today_transaction')
 ]

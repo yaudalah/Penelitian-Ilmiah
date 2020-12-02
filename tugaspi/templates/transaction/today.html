@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+{% load dictreader %}
+
+{% block content %}
+
+     <div class="container">
+        <div class="row">
+            <form method="get" class="form-inline col">   
+                <div class="form-group">
+                    <label>Hawker: </label>
+                    <select name="hawker_id" class="custom-select mr-sm-2" id="inlineFormCustomSelect">
+                        <option  {% if not selected_hawker_id %} selected {% endif %} value="">Choose Hawker...</option>
+                        {% for hawker in hawkers %}
+                            <option value={{hawker.id}} {% if hawker.id == selected_hawker_id %} selected {% endif %}>{{hawker.name}}</option>
+                        {% endfor %}
+                    </select>  
+                </div>  
+                <input type="submit" value='pilih' class="btn btn-success"/>
+            </form>
+            <div class="col">
+                <label>Tanggal:</label> {{ date }}
+            </div>
+        </div>
+        
+    </div>
+
+    <span class="border"></span>
+
+    {% if selected_hawker_id  %}
+
+         {% if form_state == option_state.not_created %}
+            <div class="container">
+                <h4>Bon hari ini belum di buat</h4>
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" value={{form_state}} name="form_state" />
+                    <input type="hidden" value={{selected_hawker_id}} name="hawker_id" />
+                    <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Buat bon hari ini</button>
+                    </div>
+                </form>
+            </div>
+        {% endif %}
+
+        {% if form_state == option_state.isi_barang %}
+            <div class="container">
+                <h4>Isi Barang</h4>
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" value={{form_state}} name="form_state" />
+                    <input type="hidden" value={{selected_hawker_id}} name="hawker_id" />
+                    <input type="hidden" value={{sales.id}} name="sales_id" />
+                    
+                    <table class="table table-sm">
+                        <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Product</th>
+                            <th scope="col">Stock Barang</th>
+                            <th scope="col">Stock Hawker</th>
+                            <th scope="col">Tambah Stock</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for product in products %}
+                        
+                        <tr>
+                            <td>{{product.name}}</td>
+                            <td>{{product.stock}}</td>
+                            <td>{{ hawker_stock_map|dictitem:product.id|default:0 }}</td>
+
+                            <td>
+                                <input type="hidden" name="product_id[]" value={{ product.id }} />
+                                <input type="number" name="product_add_stock[]" 
+                                    min=0 max={{product.stock}} step=1
+                                    placeholder="Input number" {% if  product.stock < 1 %} disabled {% endif %}>
+                            </td>
+                        </tr>
+                        
+                        {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <br/>
+                    <div class="col-6">
+                        <input type="submit" value='tambah barang' class="btn btn-success"/>
+                    </div>
+                </form>
+            </div>
+        {% endif %}
+        
+         {% if form_state == option_state.setoran %}
+            <div class="container">
+                <h4>Setoran</h4>
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" value={{form_state}} name="form_state" />
+                    <input type="hidden" value={{selected_hawker_id}} name="hawker_id" />
+                    <input type="hidden" value={{sales.id}} name="sales_id" />
+                    
+                    <table class="table table-sm">
+                        <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Product</th>
+                            <th scope="col">Stock Awal</th>
+                            <th scope="col">Tambah Stock</th>
+                            <th scope="col">Jumlah Stock</th>
+                            <th scope="col">Sisa</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for detail in sales_details %}
+                        
+                            <tr>
+                                <td>{{detail.product.name}}</td>
+                                <td>{{ detail.initial_stock }}</td>
+                                <td>{{ detail.add_stock }}</td>
+                                <td>{{ detail.initial_stock|add:detail.add_stock }}</td>
+
+                                <td>
+                                    <input type="hidden" name="product_id[]" value={{ detail.product.id }} />
+                                    <input type="number" name="product_leftover[]" 
+                                        min=0 max={{detail.initial_stock|add:detail.add_stock}} 
+                                        step=1 placeholder="Input number" required>
+                                </td>
+                            </tr>
+                        
+                        {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <br/>
+                    <div class="col-6">
+                        <input type="submit" value='hitung' class="btn btn-success"/>
+                    </div>
+                </form>
+            </div>
+        {% endif %}
+
+        {% if form_state == option_state.selesai %}
+            <div class="container">
+                <h4>Hasil Akhir</h4>
+                 
+                    <table class="table table-sm">
+                        <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Product</th>
+                            <th scope="col">Stock Awal</th>
+                            <th scope="col">Tambah Stock</th>
+                            <th scope="col">Jumlah Stock</th>
+                            <th scope="col">Terjual</th>
+                            <th scope="col">Harga</th>
+                            <th scope="col">Total</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for detail in sales_details %}
+                            <tr>
+                                <td>{{detail.product.name}}</td>
+                                <td>{{ detail.initial_stock }}</td>
+                                <td>{{ detail.add_stock }}</td>
+                                <td>{{ detail.initial_stock|add:detail.add_stock }}</td>
+                                <td>{{ detail.sold }}</td>
+                                <td>{{ detail.product.price }}</td>
+                                <td>{{ detail.total }}</td>
+                            </tr>
+                        {% endfor %}
+                            <tr>
+                                <td>Grand Total</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>{{ sales.total }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+            </div>
+        {% endif %}
+    
+    {% endif %}
+
+   
+    
+{% endblock %}
